@@ -16,7 +16,7 @@ public:
     ofxVideoPlayer() : ofVideoPlayer() {}
     virtual ~ofxVideoPlayer() {}
     
-    ofxVideoFrame& getFrame() {
+    ofxVideoFrame getFrame() {
         if(isFrameNew()) {
             // cache a new frame
             frame = ofxVideoFrame(new ofImage());

@@ -6,89 +6,93 @@
 //  Copyright (c) 2012 School of the Art Institute of Chicago. All rights reserved.
 //
 
-#include "ofxBaseVideoSource.h"
+#include "ofxVideoSourceInterface.h"
 
 
 //--------------------------------------------------------------
-ofxBaseVideoSource::ofxBaseVideoSource() {
+ofxVideoSourceInterface::ofxVideoSourceInterface() {
     openOnFirstConnection = true;
     closeOnLastDisconnect = true;;
 }
 
 //--------------------------------------------------------------
-ofxBaseVideoSource::~ofxBaseVideoSource() {
-    std::set<ofxBaseVideoSink*>::iterator iter = sinks.begin();
+ofxVideoSourceInterface::~ofxVideoSourceInterface() {
+    std::set<ofxVideoSinkInterface*>::iterator iter = sinks.begin();
     while(iter != sinks.end()) detachFromSink(*iter++);
     sinks.clear();
 }
 
 //--------------------------------------------------------------
-void ofxBaseVideoSource::source() {
+void ofxVideoSourceInterface::source() {
     if(sinks.isEmpty()) return; 
     
-    ofxVideoFrame& frame = getFrame();
-    std::set<ofxBaseVideoSink*>::iterator iter = sinks.begin();
+    ofxVideoFrame frame = getFrame();
+    std::set<ofxVideoSinkInterface*>::iterator iter = sinks.begin();
     while(iter != sinks.end()) (*iter++)->sink(frame);
+    
+    frameSent(frame);
 }
 
 //--------------------------------------------------------------
-bool ofxBaseVideoSource::isConnected() { 
+bool ofxVideoSourceInterface::isConnected() { 
     sinks.size() > 0; 
 }
 
 //--------------------------------------------------------------
-bool ofxBaseVideoSource::attachToSink(ofxBaseVideoSink* sink) {
+bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
     if(openOnFirstConnection && !isConnected() && !isOpen()) {
-        if(!open())  ofLog(OF_LOG_ERROR, "ofxBaseVideoSource::open() : error opening source.");
+        if(!open())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::open() : error opening source.");
     }
     
     if(sinks.add(sink)) {
         sinkWasAttached(sink);
         return true;
     } else {
-        ofLog(OF_LOG_ERROR, "ofxBaseVideoSource::attachToSink() : error attaching to sink.");
+        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSink() : error attaching to sink.");
         if(closeOnLastDisconnect && !isConnected() && isOpen()) {
-            if(!close())  ofLog(OF_LOG_ERROR, "ofxBaseVideoSource::close() : error closing source.");
+            close();
+//            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
         }
         return false;
     }
 }
 
 //--------------------------------------------------------------
-bool ofxBaseVideoSource::detachFromSink(ofxBaseVideoSink* sink) {
+bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
     if(sinks.remove(sink)) {
         sinkWasDetatched(sink);
         if(closeOnLastDisconnect && !isConnected() && isOpen()) {
-            if(!close())  ofLog(OF_LOG_ERROR, "ofxBaseVideoSource::close() : error closing source.");
+            close();
+//            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
         }
         return true;
     } else {
-        ofLog(OF_LOG_ERROR, "ofxBaseVideoSource::attachToSink() : error attaching to sink.");
+        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSink() : error attaching to sink.");
         return false;
     }
 }
 
 //--------------------------------------------------------------
-vector<ofxBaseVideoSink*> ofxBaseVideoSource::getSinks() const {
+vector<ofxVideoSinkInterface*> ofxVideoSourceInterface::getSinks() const {
     return sinks.toArray();
 }
 
 //--------------------------------------------------------------
-void ofxBaseVideoSource::setOpenOnFirstConnect(bool v) {
+void ofxVideoSourceInterface::setOpenOnFirstConnect(bool v) {
     openOnFirstConnection = v;
 }
 
 //--------------------------------------------------------------
-void ofxBaseVideoSource::setCloseOnLastDisconnect(bool v) {
+void ofxVideoSourceInterface::setCloseOnLastDisconnect(bool v) {
     closeOnLastDisconnect = v;
 }
 
 //--------------------------------------------------------------
-bool ofxBaseVideoSource::getOpenOnFirstConnect() {
+bool ofxVideoSourceInterface::getOpenOnFirstConnect() {
     return openOnFirstConnection;
 }
 
 //--------------------------------------------------------------
-bool ofxBaseVideoSource::getCloseOnLastDisconnect() {
+bool ofxVideoSourceInterface::getCloseOnLastDisconnect() {
     return closeOnLastDisconnect;
 }

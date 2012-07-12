@@ -13,10 +13,10 @@
 
 class ofxVideoGrabber : public ofVideoGrabber {
 public:
-    ofxVideoGrabber();
-    virtual ~ofxVideoGrabber();
+    ofxVideoGrabber() : ofVideoGrabber() {}
+    virtual ~ofxVideoGrabber() {}
     
-    ofxVideoFrame& getFrame() {
+    ofxVideoFrame getFrame() {
         if(isFrameNew()) {
             // cache a new frame
             frame = ofxVideoFrame(new ofImage());
@@ -29,4 +29,5 @@ public:
 private:
     
     ofxVideoFrame frame;
+
 };
