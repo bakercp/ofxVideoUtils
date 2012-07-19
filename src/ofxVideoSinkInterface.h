@@ -24,8 +24,9 @@
 
 #pragma once
 
+#include <set>
+
 #include "ofMain.h"
-#include "ofxSimpleSet.h"
 #include "ofxVideoFrame.h"
 #include "ofxVideoSourceInterface.h"
 
@@ -56,7 +57,9 @@ public:
     void sinkingDisabled() {};
     
     // get source list
-    vector<ofxVideoSourceInterface*> getSources();
+    set<ofxVideoSourceInterface*>& getSourcesRef();
+    
+    bool hasSource(ofxVideoSourceInterface* source);
     
     bool isSinking();
     void setSinking(bool _sinking);
@@ -64,5 +67,6 @@ private:
     
     bool sinking;
     
-    ofxSimpleSet<ofxVideoSourceInterface*> sources;
+    set<ofxVideoSourceInterface*> sources;
+    set<ofxVideoSourceInterface*>::iterator sourcesIter;
 };

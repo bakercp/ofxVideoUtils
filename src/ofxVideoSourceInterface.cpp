@@ -33,18 +33,21 @@ ofxVideoSourceInterface::ofxVideoSourceInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSourceInterface::~ofxVideoSourceInterface() {
-    std::set<ofxVideoSinkInterface*>::iterator iter = sinks.begin();
-    while(iter != sinks.end()) detachFromSink(*iter++);
+    for(sinksIter = sinks.begin();
+        sinksIter != sinks.end();
+        sinksIter++) {
+        detachFromSink(*sinksIter);
+    }
     sinks.clear();
 }
 
 //--------------------------------------------------------------
 void ofxVideoSourceInterface::source() {
-    if(sinks.isEmpty()) return; 
+    if(sinks.empty()) return; 
     
     ofxVideoFrame frame = getFrame();
-    std::set<ofxVideoSinkInterface*>::iterator iter = sinks.begin();
-    while(iter != sinks.end()) (*iter++)->sink(frame);
+    sinksIter = sinks.begin();
+    while(sinksIter != sinks.end()) (*sinksIter++)->sink(frame);
     
     frameSent(frame);
 }
@@ -60,7 +63,7 @@ bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
         if(!open())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::open() : error opening source.");
     }
     
-    if(sinks.add(sink)) {
+    if(sinks.insert(sink).second) {
         sinkWasAttached(sink);
         return true;
     } else {
@@ -75,7 +78,8 @@ bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
 
 //--------------------------------------------------------------
 bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
-    if(sinks.remove(sink)) {
+    if(hasSink(sink)) {
+        sinks.erase(sink);
         sinkWasDetatched(sink);
         if(closeOnLastDisconnect && !isConnected() && isOpen()) {
             close();
@@ -88,10 +92,10 @@ bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
     }
 }
 
-//--------------------------------------------------------------
-vector<ofxVideoSinkInterface*> ofxVideoSourceInterface::getSinks() const {
-    return sinks.toArray();
-}
+////--------------------------------------------------------------
+//vector<ofxVideoSinkInterface*> ofxVideoSourceInterface::getSinks() const {
+//    return sinks.toArray();
+//}
 
 //--------------------------------------------------------------
 void ofxVideoSourceInterface::setOpenOnFirstConnect(bool v) {
@@ -112,3 +116,9 @@ bool ofxVideoSourceInterface::getOpenOnFirstConnect() {
 bool ofxVideoSourceInterface::getCloseOnLastDisconnect() {
     return closeOnLastDisconnect;
 }
+       
+//--------------------------------------------------------------
+bool ofxVideoSourceInterface::hasSink(ofxVideoSinkInterface* sink) const {
+    return sink != NULL && sinks.find(sink) != sinks.end();
+}
+

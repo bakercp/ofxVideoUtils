@@ -43,9 +43,10 @@ ofxVideoSinkInterface::ofxVideoSinkInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSinkInterface::~ofxVideoSinkInterface() {
-    vector<ofxVideoSourceInterface*> _sources = getSources();
-    for(int i = 0; i < _sources.size(); i++) {
-        detatchFromSource(_sources[i]);
+    for(sourcesIter = sources.begin();
+        sourcesIter != sources.end();
+        sourcesIter++) {
+        detatchFromSource(*sourcesIter);
     }
     sources.clear();
 }
@@ -66,9 +67,8 @@ bool ofxVideoSinkInterface::isConnected() {
 
 //--------------------------------------------------------------
 bool ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
-    if(source->attachToSink(this)) {
-        sources.add(source);
-        return true;
+    if(!hasSource(source) && source->attachToSink(this)) {
+        return sources.insert(source).second;
     } else {
         ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSource() : error attaching to source.");
         return false;
@@ -77,8 +77,8 @@ bool ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
 
 //--------------------------------------------------------------
 bool ofxVideoSinkInterface::detatchFromSource(ofxVideoSourceInterface* source) {
-    if(source->detachFromSink(this)) {
-        sources.remove(source);
+    if(hasSource(source) && source->detachFromSink(this)) {
+        sources.erase(source);
         return true;
     } else {
         ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::detatchFromSource() : error detatching from source.");
@@ -89,6 +89,11 @@ bool ofxVideoSinkInterface::detatchFromSource(ofxVideoSourceInterface* source) {
 //--------------------------------------------------------------
 bool ofxVideoSinkInterface::isSinking() {
     return sinking;
+}
+
+//--------------------------------------------------------------
+bool ofxVideoSinkInterface::hasSource(ofxVideoSourceInterface* source) {
+    return source != NULL && sources.find(source) != sources.end();
 }
 
 //--------------------------------------------------------------

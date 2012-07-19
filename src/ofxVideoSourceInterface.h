@@ -25,8 +25,9 @@
 
 #pragma once
 
+#include <set>
+
 #include "ofMain.h"
-#include "ofxSimpleSet.h"
 #include "ofxVideoSinkInterface.h"
 
 class ofxVideoSinkInterface;
@@ -59,8 +60,10 @@ public:
     bool getOpenOnFirstConnect();
     bool getCloseOnLastDisconnect();
     
-    vector<ofxVideoSinkInterface*> getSinks() const;
+//    vector<ofxVideoSinkInterface*> getSinks() const;
 
+    bool hasSink(ofxVideoSinkInterface* sink) const;
+    
 private:
     
     ofxVideoFrame frame;
@@ -70,6 +73,7 @@ private:
     
     // no subclass access.  all access done via getters 
     // and setters so events will be called
-    ofxSimpleSet<ofxVideoSinkInterface*> sinks;
+    set<ofxVideoSinkInterface*> sinks;
+    set<ofxVideoSinkInterface*>::iterator sinksIter;
 };
 
