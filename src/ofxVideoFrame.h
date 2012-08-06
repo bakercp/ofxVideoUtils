@@ -24,5 +24,6 @@
 
 #pragma once
 #include "ofMain.h"
-typedef ofPtr< ofImage > ofxVideoFrame;
+typedef ofPtr< ofImage >   ofxVideoFrame;
+typedef ofPtr< ofTexture > ofVideoFrameTex;
 
