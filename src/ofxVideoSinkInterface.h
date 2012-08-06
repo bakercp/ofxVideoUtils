@@ -42,13 +42,12 @@ public:
     virtual bool frameReceived(ofxVideoFrame frame) = 0;
     
     // connect / disconnect
-    bool isConnected();
+    bool hasSources() const;
+    bool hasSource(ofxVideoSourceInterface* source) const;
     bool attachToSource(ofxVideoSourceInterface* source);    
-    bool detatchFromSource(ofxVideoSourceInterface* source);
+    bool detachFromAllSources();
+    bool detachFromSource(ofxVideoSourceInterface* source);
 
-//    bool remoteAttachToSource(ofxVideoSourceInterface* source);
-//    bool remoteDetachFromSource(ofxVideoSourceInterface* source);
-    
     // callbacks
     void sourceWasAttached(ofxVideoSourceInterface* source)  {}; // these callbacks are available
     void sourceWasDetatched(ofxVideoSourceInterface* source) {}; // these callbacks are available
@@ -58,8 +57,6 @@ public:
     
     // get source list
     set<ofxVideoSourceInterface*>& getSourcesRef();
-    
-    bool hasSource(ofxVideoSourceInterface* source);
     
     bool isSinking();
     void setSinking(bool _sinking);

@@ -33,44 +33,61 @@ ofxVideoSourceInterface::ofxVideoSourceInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSourceInterface::~ofxVideoSourceInterface() {
-    for(sinksIter = sinks.begin();
-        sinksIter != sinks.end();
-        sinksIter++) {
-        detachFromSink(*sinksIter);
+    detachFromAllSinks();
+}
+
+//--------------------------------------------------------------
+void ofxVideoSourceInterface::update() {
+    sourceFrame();
+}
+
+//--------------------------------------------------------------
+void ofxVideoSourceInterface::sourceFrame() {
+    if(sinks.empty()) return;
+    
+    if(isFrameNew()) {
+        // anyone who referenced the old frame will keep it.
+        // This source does not keep it, but gets a new one.
+        frame = ofPtr<ofImage>(new ofImage());
+        frame->setFromPixels(getPixelsRef());
+        
+        for(sinksIter = sinks.begin();
+            sinksIter != sinks.end(); sinksIter++) {
+            (*sinksIter)->sink(frame);
+        }
+        frameSourced(frame);
     }
-    sinks.clear();
 }
 
 //--------------------------------------------------------------
-void ofxVideoSourceInterface::source() {
-    if(sinks.empty()) return; 
-    
-    ofxVideoFrame frame = getFrame();
-    sinksIter = sinks.begin();
-    while(sinksIter != sinks.end()) (*sinksIter++)->sink(frame);
-    
-    frameSent(frame);
+bool ofxVideoSourceInterface::hasSinks() const {
+    return !sinks.empty();
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::isConnected() { 
-    sinks.size() > 0; 
+bool ofxVideoSourceInterface::hasSink(ofxVideoSinkInterface* sink) const {
+    return sink != NULL && sinks.find(sink) != sinks.end();
 }
 
 //--------------------------------------------------------------
 bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
-    if(openOnFirstConnection && !isConnected() && !isOpen()) {
-        if(!open())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::open() : error opening source.");
+    if(openOnFirstConnection && !hasSinks() && !isLoaded()) {
+        open();
+        
+        if(!isLoaded()) {
+            ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::open() : error opening source.");
+        }
     }
     
-    if(sinks.insert(sink).second) {
+    if(!hasSink(sink)) {
+        sinks.insert(sink);
         sinkWasAttached(sink);
         return true;
     } else {
         ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSink() : error attaching to sink.");
-        if(closeOnLastDisconnect && !isConnected() && isOpen()) {
+        if(closeOnLastDisconnect && !hasSinks() && isLoaded()) {
             close();
-//            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
+            //            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
         }
         return false;
     }
@@ -81,9 +98,10 @@ bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
     if(hasSink(sink)) {
         sinks.erase(sink);
         sinkWasDetatched(sink);
-        if(closeOnLastDisconnect && !isConnected() && isOpen()) {
+        
+        if(closeOnLastDisconnect && !hasSinks() && isLoaded()) {
             close();
-//            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
+            //            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
         }
         return true;
     } else {
@@ -92,10 +110,19 @@ bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
     }
 }
 
-////--------------------------------------------------------------
-//vector<ofxVideoSinkInterface*> ofxVideoSourceInterface::getSinks() const {
-//    return sinks.toArray();
-//}
+//--------------------------------------------------------------
+bool ofxVideoSourceInterface::detachFromAllSinks() {
+    for(sinksIter = sinks.begin();
+        sinksIter != sinks.end();
+        sinksIter++) {
+        if(!detachFromSink(*sinksIter)) {
+            ofLogError() << "ofxVideoSourceInterface::detachFromAllSinks() : error detatching from sink. Failing.";
+        }
+        // defer erase till end
+    }
+    sinks.clear();
+    return true;
+}
 
 //--------------------------------------------------------------
 void ofxVideoSourceInterface::setOpenOnFirstConnect(bool v) {
@@ -116,9 +143,3 @@ bool ofxVideoSourceInterface::getOpenOnFirstConnect() {
 bool ofxVideoSourceInterface::getCloseOnLastDisconnect() {
     return closeOnLastDisconnect;
 }
-       
-//--------------------------------------------------------------
-bool ofxVideoSourceInterface::hasSink(ofxVideoSinkInterface* sink) const {
-    return sink != NULL && sinks.find(sink) != sinks.end();
-}
-

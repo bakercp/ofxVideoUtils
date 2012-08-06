@@ -37,18 +37,24 @@ public:
     ofxVideoSourceInterface();
     virtual ~ofxVideoSourceInterface();
 
-    virtual ofxVideoFrame getFrame() = 0;
+    void update();
     
-    void source(); // push frames
-    virtual void frameSent(ofxVideoFrame frame) {};
+    void sourceFrame(); // push frames
     
-    virtual bool close() = 0;
-    virtual bool open() = 0;
-    virtual bool isOpen() = 0;
+    virtual void frameSourced(ofxVideoFrame frame) {};
+    
+    virtual bool isFrameNew() = 0;
+    virtual ofPixelsRef getPixelsRef() = 0;
+    
+    virtual void close() {};
+    virtual void open()  {};
+    virtual bool isLoaded() = 0;
         
-    bool isConnected();
+    bool hasSinks() const;
+    bool hasSink(ofxVideoSinkInterface* sink) const;
     
     bool attachToSink(ofxVideoSinkInterface* sink); // sinks call this to be fed by this source
+    bool detachFromAllSinks();
     bool detachFromSink(ofxVideoSinkInterface* sink); // sinks call this to be cut off from this source
 
     void sinkWasAttached(ofxVideoSinkInterface* sink)  {}; // these callbacks are available
@@ -59,14 +65,13 @@ public:
     
     bool getOpenOnFirstConnect();
     bool getCloseOnLastDisconnect();
+ 
+    set<ofxVideoSinkInterface*> getSinksRef();
     
-//    vector<ofxVideoSinkInterface*> getSinks() const;
-
-    bool hasSink(ofxVideoSinkInterface* sink) const;
-    
-private:
-    
+protected:
     ofxVideoFrame frame;
+
+private:
     
     bool openOnFirstConnection;
     bool closeOnLastDisconnect;

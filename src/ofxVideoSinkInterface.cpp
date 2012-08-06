@@ -24,18 +24,6 @@
 
 #include "ofxVideoSourceInterface.h"
 
-
-//bool attachToSource(ofxVideoSourceInterface* source);    
-//bool detatchFromSource(ofxVideoSourceInterface* source);
-//
-//// callbacks
-//bool sourceWasAttached(ofxVideoSourceInterface* source)  {}; // these callbacks are available
-//bool sourceWasDetatched(ofxVideoSourceInterface* source) {}; // these callbacks are available
-//
-//// get source list
-//vector<ofxVideoSourceInterface*> getSources();
-
-
 //--------------------------------------------------------------
 ofxVideoSinkInterface::ofxVideoSinkInterface() {
     sinking = true;
@@ -43,12 +31,7 @@ ofxVideoSinkInterface::ofxVideoSinkInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSinkInterface::~ofxVideoSinkInterface() {
-    for(sourcesIter = sources.begin();
-        sourcesIter != sources.end();
-        sourcesIter++) {
-        detatchFromSource(*sourcesIter);
-    }
-    sources.clear();
+    detachFromAllSources();
 }
 
 //--------------------------------------------------------------
@@ -61,8 +44,13 @@ bool ofxVideoSinkInterface::sink(ofxVideoFrame frame) {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::isConnected() { 
-    return sources.size() > 0; 
+bool ofxVideoSinkInterface::hasSources() const {
+    return !sources.empty();
+}
+
+//--------------------------------------------------------------
+bool ofxVideoSinkInterface::hasSource(ofxVideoSourceInterface* source) const {
+    return source != NULL && sources.find(source) != sources.end();
 }
 
 //--------------------------------------------------------------
@@ -76,7 +64,22 @@ bool ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::detatchFromSource(ofxVideoSourceInterface* source) {
+bool ofxVideoSinkInterface::detachFromAllSources() {
+    for(sourcesIter = sources.begin();
+        sourcesIter != sources.end();
+        sourcesIter++) {
+        if(!detachFromSource(*sourcesIter)) {
+            ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::detachFromAllSources() : error detaching from source.");
+        }
+    }
+    sources.clear();
+    
+    return true;
+}
+
+
+//--------------------------------------------------------------
+bool ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
     if(hasSource(source) && source->detachFromSink(this)) {
         sources.erase(source);
         return true;
@@ -91,10 +94,6 @@ bool ofxVideoSinkInterface::isSinking() {
     return sinking;
 }
 
-//--------------------------------------------------------------
-bool ofxVideoSinkInterface::hasSource(ofxVideoSourceInterface* source) {
-    return source != NULL && sources.find(source) != sources.end();
-}
 
 //--------------------------------------------------------------
 void ofxVideoSinkInterface::setSinking(bool _sinking) {
