@@ -41,7 +41,7 @@ public:
     
     void sourceFrame(); // push frames
     
-    virtual void frameSourced(ofxVideoFrame frame) {};
+    virtual void frameSourced(ofxSharedVideoFrame frame) {};
     
     virtual bool isFrameNew() = 0;
     virtual ofPixelsRef getPixelsRef() = 0;
@@ -69,7 +69,7 @@ public:
     set<ofxVideoSinkInterface*> getSinksRef();
     
 protected:
-    ofxVideoFrame frame;
+    ofxSharedVideoFrame frame;
 
 private:
     

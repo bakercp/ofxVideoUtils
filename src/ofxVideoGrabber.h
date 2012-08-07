@@ -25,17 +25,17 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxVideoFrame.h"
+#include "ofxSharedVideoFrame.h"
 
 class ofxVideoGrabber : public ofVideoGrabber {
 public:
     ofxVideoGrabber() : ofVideoGrabber() {}
     virtual ~ofxVideoGrabber() {}
     
-    ofxVideoFrame getFrame() {
+    ofxSharedVideoFrame getFrame() {
         if(isFrameNew()) {
             // cache a new frame
-            frame = ofxVideoFrame(new ofImage());
+            frame = ofxSharedVideoFrame(new ofImage());
             frame->setFromPixels(getPixelsRef());
         } else {
             return frame;
@@ -44,6 +44,6 @@ public:
     
 private:
     
-    ofxVideoFrame frame;
+    ofxSharedVideoFrame frame;
 
 };

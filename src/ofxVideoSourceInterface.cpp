@@ -48,7 +48,7 @@ void ofxVideoSourceInterface::sourceFrame() {
     if(isFrameNew()) {
         // anyone who referenced the old frame will keep it.
         // This source does not keep it, but gets a new one.
-        frame = ofPtr<ofImage>(new ofImage());
+        frame = ofxSharedVideoFrame(new ofxVideoFrame());
         frame->setFromPixels(getPixelsRef());
         
         for(sinksIter = sinks.begin();

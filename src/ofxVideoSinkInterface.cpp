@@ -35,7 +35,7 @@ ofxVideoSinkInterface::~ofxVideoSinkInterface() {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::sink(ofxVideoFrame frame) {
+bool ofxVideoSinkInterface::sink(ofxSharedVideoFrame frame) {
     if(isSinking()) {
         return frameReceived(frame);
     } else {

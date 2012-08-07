@@ -38,8 +38,8 @@ public:
     
     virtual ~ofxVideoSinkInterface();
     
-    bool sink(ofxVideoFrame frame);
-    virtual bool frameReceived(ofxVideoFrame frame) = 0;
+    bool sink(ofxSharedVideoFrame frame);
+    virtual bool frameReceived(ofxSharedVideoFrame frame) = 0;
     
     // connect / disconnect
     bool hasSources() const;

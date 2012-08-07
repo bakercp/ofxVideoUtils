@@ -33,10 +33,10 @@ public:
     ofxVideoPlayer() : ofVideoPlayer() {}
     virtual ~ofxVideoPlayer() {}
     
-    ofxVideoFrame getFrame() {
+    ofxSharedVideoFrame getFrame() {
         if(isFrameNew()) {
             // cache a new frame
-            frame = ofxVideoFrame(new ofImage());
+            frame = ofxSharedVideoFrame(new ofxVideoFrame());
             frame->setFromPixels(getPixelsRef());
         } else {
             return frame;
@@ -45,6 +45,6 @@ public:
     
 private:
     
-    ofxVideoFrame frame;
+    ofxSharedVideoFrame frame;
     
 };
