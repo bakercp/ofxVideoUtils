@@ -63,8 +63,8 @@ public:
     void setOpenOnFirstConnect(bool v);
     void setCloseOnLastDisconnect(bool v);
     
-    bool getOpenOnFirstConnect();
-    bool getCloseOnLastDisconnect();
+    bool getOpenOnFirstConnect() const;
+    bool getCloseOnLastDisconnect() const;
  
     set<ofxVideoSinkInterface*> getSinksRef();
     

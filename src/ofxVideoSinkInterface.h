@@ -58,7 +58,7 @@ public:
     // get source list
     set<ofxVideoSourceInterface*>& getSourcesRef();
     
-    bool isSinking();
+    bool isSinking() const;
     void setSinking(bool _sinking);
 private:
     
