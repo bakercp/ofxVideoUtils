@@ -90,7 +90,7 @@ bool ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::isSinking() {
+bool ofxVideoSinkInterface::isSinking() const {
     return sinking;
 }
 

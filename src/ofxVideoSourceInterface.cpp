@@ -135,11 +135,11 @@ void ofxVideoSourceInterface::setCloseOnLastDisconnect(bool v) {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::getOpenOnFirstConnect() {
+bool ofxVideoSourceInterface::getOpenOnFirstConnect() const {
     return openOnFirstConnection;
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::getCloseOnLastDisconnect() {
+bool ofxVideoSourceInterface::getCloseOnLastDisconnect() const {
     return closeOnLastDisconnect;
 }
