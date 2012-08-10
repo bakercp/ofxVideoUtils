@@ -81,6 +81,7 @@ bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
     
     if(!hasSink(sink)) {
         sinks.insert(sink);
+        sink->sink(frame); // immediately send the latest image
         sinkWasAttached(sink);
         return true;
     } else {
