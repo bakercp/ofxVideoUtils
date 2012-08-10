@@ -33,7 +33,7 @@ ofxVideoSourceInterface::ofxVideoSourceInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSourceInterface::~ofxVideoSourceInterface() {
-    detachFromAllSinks();
+    detachFromSinks();
 }
 
 //--------------------------------------------------------------
@@ -70,59 +70,34 @@ bool ofxVideoSourceInterface::hasSink(ofxVideoSinkInterface* sink) const {
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
-    if(openOnFirstConnection && !hasSinks() && !isLoaded()) {
-        open();
-        
-        if(!isLoaded()) {
-            ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::open() : error opening source.");
-        }
-    }
-    
+void ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
     if(!hasSink(sink)) {
-        sinks.insert(sink);
-        sink->sink(frame); // immediately send the latest image
-        sinkWasAttached(sink);
-        return true;
+        sink->registerSource(this);
+        registerSink(sink);
     } else {
-        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSink() : error attaching to sink.");
-        if(closeOnLastDisconnect && !hasSinks() && isLoaded()) {
-            close();
-            //            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
-        }
-        return false;
+        ofLogWarning("ofxVideoSourceInterface::attachToSink : sink already attached to this source.");
     }
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
+void ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
     if(hasSink(sink)) {
-        sinks.erase(sink);
-        sinkWasDetatched(sink);
-        
-        if(closeOnLastDisconnect && !hasSinks() && isLoaded()) {
-            close();
-            //            if(!close())  ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::close() : error closing source.");
-        }
-        return true;
+        sink->unregisterSource(this);
+        unregisterSink(sink);
     } else {
-        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSink() : error attaching to sink.");
-        return false;
+        ofLogWarning() << "ofxVideoSourceInterface::detachFromMe() : Was not attached to you.";
     }
 }
 
+
 //--------------------------------------------------------------
-bool ofxVideoSourceInterface::detachFromAllSinks() {
+void ofxVideoSourceInterface::detachFromSinks() {
     for(sinksIter = sinks.begin();
         sinksIter != sinks.end();
         sinksIter++) {
-        if(!detachFromSink(*sinksIter)) {
-            ofLogError() << "ofxVideoSourceInterface::detachFromAllSinks() : error detatching from sink. Failing.";
-        }
-        // defer erase till end
+        detachFromSink(*sinksIter);
     }
     sinks.clear();
-    return true;
 }
 
 //--------------------------------------------------------------
@@ -144,3 +119,42 @@ bool ofxVideoSourceInterface::getOpenOnFirstConnect() const {
 bool ofxVideoSourceInterface::getCloseOnLastDisconnect() const {
     return closeOnLastDisconnect;
 }
+
+
+
+
+
+
+//--------------------------------------------------------------
+void ofxVideoSourceInterface::registerSink(ofxVideoSinkInterface *sink) {
+    if(!hasSink(sink)) {
+        sinks.insert(sink);
+        sink->sink(frame); // immediately send the latest image
+        sinkWasAttached(sink);
+        
+        // open this source if it is not already open
+        if(openOnFirstConnection && !isLoaded()) {
+            open();
+        }
+    } else {
+        ofLogWarning("ofxVideoSourceInterface::attachToSink : sink already attached to this source.");
+    }
+}
+
+
+//--------------------------------------------------------------
+void ofxVideoSourceInterface::unregisterSink(ofxVideoSinkInterface* sink) {
+    if(hasSink(sink)) {
+        sinks.erase(sink);
+        sinkWasDetatched(sink);
+        if(closeOnLastDisconnect && // if we are supposed to
+           !hasSinks() && // and all the sinks are gone
+           isLoaded()) { // and we are running
+            close();
+        }
+    } else {
+        ofLogWarning() << "ofxVideoSourceInterface::unregisterSink() : Was not attached to you.";
+    }
+}
+
+

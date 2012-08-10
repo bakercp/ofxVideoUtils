@@ -44,10 +44,11 @@ public:
     // connect / disconnect
     bool hasSources() const;
     bool hasSource(ofxVideoSourceInterface* source) const;
-    bool attachToSource(ofxVideoSourceInterface* source);    
-    bool detachFromAllSources();
-    bool detachFromSource(ofxVideoSourceInterface* source);
-
+   
+    void attachToSource(ofxVideoSourceInterface* source);
+    void detachFromSource(ofxVideoSourceInterface* source);
+    void detachFromSources();
+    
     // callbacks
     void sourceWasAttached(ofxVideoSourceInterface* source)  {}; // these callbacks are available
     void sourceWasDetatched(ofxVideoSourceInterface* source) {}; // these callbacks are available
@@ -62,6 +63,11 @@ public:
     void setSinking(bool _sinking);
 private:
     
+    friend class ofxVideoSourceInterface;
+
+    void registerSource(ofxVideoSourceInterface* source);
+    void unregisterSource(ofxVideoSourceInterface* source);
+
     bool sinking;
     
     set<ofxVideoSourceInterface*> sources;

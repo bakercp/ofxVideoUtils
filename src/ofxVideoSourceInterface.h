@@ -53,10 +53,10 @@ public:
     bool hasSinks() const;
     bool hasSink(ofxVideoSinkInterface* sink) const;
     
-    bool attachToSink(ofxVideoSinkInterface* sink); // sinks call this to be fed by this source
-    bool detachFromAllSinks();
-    bool detachFromSink(ofxVideoSinkInterface* sink); // sinks call this to be cut off from this source
-
+    void attachToSink(ofxVideoSinkInterface* sink); // sinks call this to be fed by this source
+    void detachFromSink(ofxVideoSinkInterface* sink); // sinks call this to be cut off from this source
+    void detachFromSinks();
+    
     void sinkWasAttached(ofxVideoSinkInterface* sink)  {}; // these callbacks are available
     void sinkWasDetatched(ofxVideoSinkInterface* sink) {}; // these callbacks are available
     
@@ -73,6 +73,11 @@ protected:
 
 private:
     
+    friend class ofxVideoSinkInterface;
+    
+    void registerSink(ofxVideoSinkInterface* sink);
+    void unregisterSink(ofxVideoSinkInterface* sink);
+
     bool openOnFirstConnection;
     bool closeOnLastDisconnect;
     

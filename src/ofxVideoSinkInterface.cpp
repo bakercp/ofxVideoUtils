@@ -31,7 +31,7 @@ ofxVideoSinkInterface::ofxVideoSinkInterface() {
 
 //--------------------------------------------------------------
 ofxVideoSinkInterface::~ofxVideoSinkInterface() {
-    detachFromAllSources();
+    detachFromSources();
 }
 
 //--------------------------------------------------------------
@@ -53,47 +53,42 @@ bool ofxVideoSinkInterface::hasSource(ofxVideoSourceInterface* source) const {
     return source != NULL && sources.find(source) != sources.end();
 }
 
+
+
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
-    if(!hasSource(source) && source->attachToSink(this)) {
-        return sources.insert(source).second;
+void ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
+    if(!hasSource(source)) {
+        source->registerSink(this);
+        registerSource(source);
     } else {
-        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::attachToSource() : error attaching to source.");
-        return false;
+        ofLogWarning() << "ofxVideoSinkInterface::attachToSource() : this sink was already attached to source.";
     }
 }
 
 //--------------------------------------------------------------
-bool ofxVideoSinkInterface::detachFromAllSources() {
+void ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
+    if(hasSource(source)) {
+        source->unregisterSink(this);
+        unregisterSource(source);
+    } else {
+        ofLogWarning() << "ofxVideoSinkInterface::detachFromSource() : this sink was not attached to the source.";
+    }
+}
+
+//--------------------------------------------------------------
+void ofxVideoSinkInterface::detachFromSources() {
     for(sourcesIter = sources.begin();
         sourcesIter != sources.end();
         sourcesIter++) {
-        if(!detachFromSource(*sourcesIter)) {
-            ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::detachFromAllSources() : error detaching from source.");
-        }
+        detachFromSource(*sourcesIter);
     }
     sources.clear();
-    
-    return true;
-}
-
-
-//--------------------------------------------------------------
-bool ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
-    if(hasSource(source) && source->detachFromSink(this)) {
-        sources.erase(source);
-        return true;
-    } else {
-        ofLog(OF_LOG_ERROR, "ofxVideoSourceInterface::detatchFromSource() : error detatching from source.");
-        return false;
-    }
 }
 
 //--------------------------------------------------------------
 bool ofxVideoSinkInterface::isSinking() const {
     return sinking;
 }
-
 
 //--------------------------------------------------------------
 void ofxVideoSinkInterface::setSinking(bool _sinking) {
@@ -106,4 +101,28 @@ void ofxVideoSinkInterface::setSinking(bool _sinking) {
         }
     }
 }
+
+
+//--------------------------------------------------------------
+void ofxVideoSinkInterface::registerSource(ofxVideoSourceInterface* source) {
+    if(!hasSource(source)) {
+        sources.insert(source);
+        sourceWasAttached(source);
+    } else {
+        ofLogWarning("ofxVideoSinkInterface::registerSource : source already attached to this sink.");
+    }
+}
+
+//--------------------------------------------------------------
+void ofxVideoSinkInterface::unregisterSource(ofxVideoSourceInterface* source) {
+    if(hasSource(source)) {
+        sources.erase(source);
+        sourceWasDetatched(source);
+    } else {
+        ofLogWarning("ofxVideoSinkInterface::unregisterSource : source not attached to this sink.");
+    }
+}
+
+
+
 
