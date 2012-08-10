@@ -94,10 +94,9 @@ void ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
 void ofxVideoSourceInterface::detachFromSinks() {
     for(sinksIter = sinks.begin();
         sinksIter != sinks.end();
-        sinksIter++) {
-        detachFromSink(*sinksIter);
+        ) {
+        detachFromSink(*sinksIter++); // ++ deals with std::set lack of iterator invalidation during erase operation
     }
-    sinks.clear();
 }
 
 //--------------------------------------------------------------

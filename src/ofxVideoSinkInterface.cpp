@@ -78,11 +78,9 @@ void ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
 //--------------------------------------------------------------
 void ofxVideoSinkInterface::detachFromSources() {
     for(sourcesIter = sources.begin();
-        sourcesIter != sources.end();
-        sourcesIter++) {
-        detachFromSource(*sourcesIter);
+        sourcesIter != sources.end();) {
+        detachFromSource(*sourcesIter++); // ++ deals with std::set lack of iterator invalidation during erase operation
     }
-    sources.clear();
 }
 
 //--------------------------------------------------------------
