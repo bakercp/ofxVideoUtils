@@ -40,6 +40,7 @@ public:
     
     bool sink(ofxSharedVideoFrame frame);
     virtual bool frameReceived(ofxSharedVideoFrame frame) = 0;
+    virtual void clear() {};
     
     // connect / disconnect
     bool hasSources() const;
