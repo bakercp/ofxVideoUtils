@@ -48,3 +48,5 @@ private:
     ofxSharedVideoFrame frame;
     
 };
+
+typedef ofPtr < ofxVideoPlayer > ofxSharedVideoPlayer;
