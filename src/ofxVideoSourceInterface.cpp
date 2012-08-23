@@ -28,7 +28,9 @@
 //--------------------------------------------------------------
 ofxVideoSourceInterface::ofxVideoSourceInterface() {
     openOnFirstConnection = true;
-    closeOnLastDisconnect = true;;
+    closeOnLastDisconnect = true;
+    
+    frame = ofxSharedVideoFrame(new ofxVideoFrame());
 }
 
 //--------------------------------------------------------------
@@ -43,9 +45,16 @@ void ofxVideoSourceInterface::update() {
 
 //--------------------------------------------------------------
 void ofxVideoSourceInterface::sourceFrame() {
-    if(sinks.empty()) return;
-    
+    //cout << ">>" << endl;
+    if(sinks.empty()) {
+        //cout << "><<<<" << endl;
+        return;
+    }
+    //cout << ">> en" << endl;
     if(isFrameNew()) {
+        
+        //cout << ">> 1. en" << endl;
+
         // anyone who referenced the old frame will keep it.
         // This source does not keep it, but gets a new one.
         frame = ofxSharedVideoFrame(new ofxVideoFrame());
@@ -54,6 +63,7 @@ void ofxVideoSourceInterface::sourceFrame() {
         for(sinksIter = sinks.begin();
             sinksIter != sinks.end(); sinksIter++) {
             (*sinksIter)->sink(frame);
+            //cout << ">> 2. en" << endl;
         }
         frameSourced(frame);
     }
