@@ -85,7 +85,7 @@ void ofxVideoSourceInterface::attachToSink(ofxVideoSinkInterface* sink) {
         sink->registerSource(this);
         registerSink(sink);
     } else {
-        ofLogWarning("ofxVideoSourceInterface::attachToSink : sink already attached to this source.");
+        ofLogWarning("ofxVideoSourceInterface") << "attachToSink : sink already attached to this source.";
     }
 }
 
@@ -95,7 +95,7 @@ void ofxVideoSourceInterface::detachFromSink(ofxVideoSinkInterface* sink) {
         sink->unregisterSource(this);
         unregisterSink(sink);
     } else {
-        ofLogWarning() << "ofxVideoSourceInterface::detachFromMe() : Was not attached to you.";
+        ofLogWarning("ofxVideoSourceInterface") << "detachFromMe() : Was not attached to you.";
     }
 }
 
@@ -146,7 +146,7 @@ void ofxVideoSourceInterface::registerSink(ofxVideoSinkInterface *sink) {
             open();
         }
     } else {
-        ofLogWarning("ofxVideoSourceInterface::attachToSink : sink already attached to this source.");
+        ofLogWarning("ofxVideoSourceInterface") << "attachToSink : sink already attached to this source.";
     }
 }
 
@@ -162,7 +162,7 @@ void ofxVideoSourceInterface::unregisterSink(ofxVideoSinkInterface* sink) {
             close();
         }
     } else {
-        ofLogWarning() << "ofxVideoSourceInterface::unregisterSink() : Was not attached to you.";
+        ofLogWarning("ofxVideoSourceInterface") << "unregisterSink() : Was not attached to you.";
     }
 }
 

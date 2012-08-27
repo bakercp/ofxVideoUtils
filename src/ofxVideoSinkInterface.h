@@ -38,9 +38,19 @@ public:
     
     virtual ~ofxVideoSinkInterface();
     
+    virtual void update();
+    
+    bool isFrameNew();
+
     bool sink(ofxSharedVideoFrame frame);
-    virtual bool frameReceived(ofxSharedVideoFrame frame) = 0;
-    virtual void clear() {};
+    virtual bool frameReceived(ofxSharedVideoFrame frame) {
+        ofLogWarning("ofxVideoSinkInterface") << "frameReceived() not implemented by subclass.";
+    }
+    
+    virtual void clear() {
+        ofLogNotice("ofxVideoSinkInterface") << "clear() not implemented by subclass.";
+    }
+    
     
     // connect / disconnect
     bool hasSources() const;
@@ -51,11 +61,20 @@ public:
     void detachFromSources();
     
     // callbacks
-    void sourceWasAttached(ofxVideoSourceInterface* source)  {}; // these callbacks are available
-    void sourceWasDetatched(ofxVideoSourceInterface* source) {}; // these callbacks are available
+    void sourceWasAttached(ofxVideoSourceInterface* source)  {
+        ofLogNotice("ofxVideoSinkInterface") << "sourceWasAttached() not implemented by subclass.";
+    }; // these callbacks are available
     
-    void sinkingEnabled() {};
-    void sinkingDisabled() {};
+    void sourceWasDetatched(ofxVideoSourceInterface* source) {
+        ofLogNotice("ofxVideoSinkInterface") << "sourceWasDetatched() not implemented by subclass.";
+    }; // these callbacks are available
+    
+    void sinkingWasEnabled() {
+        ofLogNotice("ofxVideoSinkInterface") << "sinkingWasEnabled() not implemented by subclass.";
+    };
+    void sinkingWasDisabled() {
+        ofLogNotice("ofxVideoSinkInterface") << "sinkingWasDisabled() not implemented by subclass.";
+    };
     
     // get source list
     set<ofxVideoSourceInterface*>& getSourcesRef();
@@ -63,6 +82,9 @@ public:
     bool isSinking() const;
     void setSinking(bool _sinking);
 private:
+    
+    bool bFrameHasChanged;
+    bool bIsFrameNew;
     
     friend class ofxVideoSourceInterface;
 

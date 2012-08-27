@@ -27,6 +27,8 @@
 //--------------------------------------------------------------
 ofxVideoSinkInterface::ofxVideoSinkInterface() {
     sinking = true;
+    bFrameHasChanged = false;
+    bIsFrameNew = false;
 }
 
 //--------------------------------------------------------------
@@ -35,8 +37,24 @@ ofxVideoSinkInterface::~ofxVideoSinkInterface() {
 }
 
 //--------------------------------------------------------------
+void ofxVideoSinkInterface::update() {
+    bIsFrameNew = false;
+    if (bFrameHasChanged == true){
+        bIsFrameNew = true;
+        bFrameHasChanged = false;
+    }
+}
+
+//--------------------------------------------------------------
+bool ofxVideoSinkInterface::isFrameNew() {
+    return bIsFrameNew;
+}
+
+//--------------------------------------------------------------
 bool ofxVideoSinkInterface::sink(ofxSharedVideoFrame frame) {
     if(isSinking()) {
+        // we check for newness on the source side and rely on that here
+        bFrameHasChanged = true;
         return frameReceived(frame);
     } else {
         return false;
@@ -61,7 +79,7 @@ void ofxVideoSinkInterface::attachToSource(ofxVideoSourceInterface* source) {
         source->registerSink(this);
         registerSource(source);
     } else {
-        ofLogWarning() << "ofxVideoSinkInterface::attachToSource() : this sink was already attached to source.";
+        ofLogWarning("ofxVideoSinkInterface") << "attachToSource() : this sink was already attached to source.";
     }
 }
 
@@ -71,7 +89,7 @@ void ofxVideoSinkInterface::detachFromSource(ofxVideoSourceInterface* source) {
         source->unregisterSink(this);
         unregisterSource(source);
     } else {
-        ofLogWarning() << "ofxVideoSinkInterface::detachFromSource() : this sink was not attached to the source.";
+        ofLogWarning("ofxVideoSinkInterface") << "detachFromSource() : this sink was not attached to the source.";
     }
 }
 
@@ -93,9 +111,9 @@ void ofxVideoSinkInterface::setSinking(bool _sinking) {
     if(_sinking != sinking) {
         sinking = _sinking;
         if(sinking) {
-            sinkingEnabled();
+            sinkingWasEnabled();
         } else {
-            sinkingDisabled();
+            sinkingWasDisabled();
         }
     }
 }
@@ -107,7 +125,7 @@ void ofxVideoSinkInterface::registerSource(ofxVideoSourceInterface* source) {
         sources.insert(source);
         sourceWasAttached(source);
     } else {
-        ofLogWarning("ofxVideoSinkInterface::registerSource : source already attached to this sink.");
+        ofLogWarning("ofxVideoSinkInterface") << "registerSource : source already attached to this sink.";
     }
 }
 
@@ -117,7 +135,7 @@ void ofxVideoSinkInterface::unregisterSource(ofxVideoSourceInterface* source) {
         sources.erase(source);
         sourceWasDetatched(source);
     } else {
-        ofLogWarning("ofxVideoSinkInterface::unregisterSource : source not attached to this sink.");
+        ofLogWarning("ofxVideoSinkInterface") << "unregisterSource : source not attached to this sink.";
     }
 }
 
