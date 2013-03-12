@@ -30,16 +30,28 @@
 // onto the graphics card.  need a better way to pass textures as video frames w/o all the
 // other info.
 
+//template<typename T>
+//class ofImage_;
+//
+//typedef ofImage_<unsigned char> ofImage;
+//typedef ofImage_<float> ofFloatImage;
+//typedef ofImage_<unsigned short> ofShortImage;
+
+
 typedef ofImage ofxVideoFrame; // we need a smarter ofImage here --
                                // ofxVideoFrame below might be an option, but since ofImage
                                // already has a member ofTexture, it all seems rather redundant
+
+typedef ofFloatImage ofxFloatVideoFrame;
+typedef ofShortImage ofxShortVideoFrame;
 
 // could subclass ofImage and access protected tex and bIsUsingTexture --
 // it will still draw, even if it it does not have pixels allocated
 // problems arise w/ getWidth() / getHeight(), which are set w/ freeimage, etc.
 
-
 typedef ofPtr< ofxVideoFrame >  ofxSharedVideoFrame;
+typedef ofPtr< ofxFloatVideoFrame >  ofxSharedFloatVideoFrame;
+typedef ofPtr< ofxShortVideoFrame >  ofxSharedShortVideoFrame;
 
 
 ///////////
