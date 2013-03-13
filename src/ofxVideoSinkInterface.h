@@ -45,6 +45,7 @@ public:
     bool sink(ofxSharedVideoFrame frame);
     virtual bool frameReceived(ofxSharedVideoFrame frame) {
         ofLogWarning("ofxVideoSinkInterface") << "frameReceived() not implemented by subclass.";
+        return false;
     }
     
     virtual void clear() {

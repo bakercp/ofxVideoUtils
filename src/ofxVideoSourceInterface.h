@@ -68,6 +68,8 @@ public:
  
     set<ofxVideoSinkInterface*> getSinksRef();
     
+    bool fequals(float f0, float f1) { return fabs(f1 - f0) < numeric_limits<float>::epsilon(); }
+    
 protected:
     ofxSharedVideoFrame frame;
 

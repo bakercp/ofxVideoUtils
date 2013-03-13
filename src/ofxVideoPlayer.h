@@ -34,13 +34,14 @@ public:
     virtual ~ofxVideoPlayer() {}
     
     ofxSharedVideoFrame getFrame() {
+        
         if(isFrameNew()) {
             // cache a new frame
             frame = ofxSharedVideoFrame(new ofxVideoFrame());
             frame->setFromPixels(getPixelsRef());
-        } else {
-            return frame;
         }
+        
+        return frame;
     }
     
 private:
