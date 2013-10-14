@@ -51,7 +51,19 @@ public:
 
     std::weak_ptr<BaseSharedFrameProvider_<Frame_<PixelType> > > getSource();
 
-    static std::shared_ptr<Frame_<PixelType> > emptySharedFrame();
+    static SharedPtr makeShared()
+    {
+        static std::shared_ptr<Frame_<PixelType> > empty;
+
+        if(!empty)
+        {
+            ofPixels_<PixelType> pixels;
+            pixels.allocate(1,1,OF_PIXELS_RGBA);
+            empty = std::shared_ptr<Frame_<PixelType> >(new Frame_<PixelType>(pixels));
+        }
+        
+        return empty;
+    }
 
 private:
     Poco::Timestamp  _timestamp;
@@ -62,8 +74,6 @@ private:
 
 
 typedef Frame_<unsigned char> Frame;
-//typedef Frame_<unsigned char>::SharedPtr SharedFrame;
-//typedef Frame_<unsigned char>::WeakPtr   WeakFrame;
 
 
 template<typename PixelType>
@@ -95,21 +105,6 @@ template<typename PixelType>
 std::weak_ptr<BaseSharedFrameProvider_<Frame_<PixelType> > > Frame_<PixelType>::getSource()
 {
     return _source;
-}
-
-template<typename PixelType>
-std::shared_ptr<Frame_<PixelType> > Frame_<PixelType>::emptySharedFrame()
-{
-    static std::shared_ptr<Frame_<PixelType> > empty;
-
-    if(!empty)
-    {
-        ofPixels_<PixelType> pixels;
-        pixels.allocate(1,1,OF_PIXELS_RGBA);
-        empty = std::shared_ptr<Frame_<PixelType> >(new Frame_<PixelType>(pixels));
-    }
-
-    return empty;
 }
 
 

@@ -47,7 +47,7 @@ public:
     FrameBufferPlayer_();
     ~FrameBufferPlayer_();
 
-    void loadBuffer(std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer);
+    void loadBuffer(std::shared_ptr<FrameBuffer_<FrameType> > buffer);
     bool isLoaded() const;
 
     void reset();
@@ -139,8 +139,13 @@ public:
     std::shared_ptr<FrameType> getSharedFrame() const;
     std::shared_ptr<FrameType> getSharedFrame();
 
+    static SharedPtr makeShared()
+    {
+        return SharedPtr(new FrameBufferPlayer_());
+    }
+
 private:
-    typedef std::weak_ptr<BaseFrameBuffer_<FrameType> > Data;
+    typedef std::weak_ptr<FrameBuffer_<FrameType> > Data;
 
     Data _buffer;
 
@@ -200,11 +205,8 @@ FrameBufferPlayer_<FrameType,PixelType>::~FrameBufferPlayer_()
 
 //------------------------------------------------------------------------------
 template<typename FrameType,typename PixelType>
-void FrameBufferPlayer_<FrameType,PixelType>::loadBuffer(std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer)
+void FrameBufferPlayer_<FrameType,PixelType>::loadBuffer(std::shared_ptr<FrameBuffer_<FrameType> > buffer)
 {
-   // buffer->to
-
-
     _buffer = buffer;
 }
 
@@ -212,7 +214,7 @@ void FrameBufferPlayer_<FrameType,PixelType>::loadBuffer(std::shared_ptr<BaseFra
 template<typename FrameType,typename PixelType>
 bool FrameBufferPlayer_<FrameType,PixelType>::isLoaded() const
 {
-    return true;//_buffer != NULL;
+    return !_buffer.expired();
 }
 
 //------------------------------------------------------------------------------
@@ -331,7 +333,7 @@ void FrameBufferPlayer_<FrameType,PixelType>::setUseTexture(bool bUseTex)
 template<typename FrameType,typename PixelType>
 int FrameBufferPlayer_<FrameType,PixelType>::getCount() const
 {
-    std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer = _buffer.lock();
+    std::shared_ptr<FrameBuffer_<FrameType> > buffer = _buffer.lock();
 
     if(buffer)
     {
@@ -347,7 +349,7 @@ int FrameBufferPlayer_<FrameType,PixelType>::getCount() const
 template<typename FrameType,typename PixelType>
 int FrameBufferPlayer_<FrameType,PixelType>::getCapacity() const
 {
-    std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer = _buffer.lock();
+    std::shared_ptr<FrameBuffer_<FrameType> > buffer = _buffer.lock();
 
     if(buffer)
     {
@@ -407,7 +409,7 @@ void FrameBufferPlayer_<FrameType,PixelType>::update() {
         numFramesToPush     = elapsedTime / frameDuration; // can be negative
         numFramesToPush    += _lastFrameFraction;           // add on any leftovers from last frame
 
-        float fNumFramesToPush = floor(numFramesToPush);
+        float fNumFramesToPush = std::floor(numFramesToPush);
 
         _lastFrameFraction   =  numFramesToPush - fNumFramesToPush;
         numFramesToPush     = fNumFramesToPush;
@@ -706,7 +708,7 @@ float FrameBufferPlayer_<FrameType,PixelType>::getSpeed() const
 template<typename FrameType,typename PixelType>
 float FrameBufferPlayer_<FrameType,PixelType>::getFrameRate() const
 {
-    std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer = _buffer.lock();
+    std::shared_ptr<FrameBuffer_<FrameType> > buffer = _buffer.lock();
 
     if(buffer)
     {
@@ -811,7 +813,7 @@ float FrameBufferPlayer_<FrameType,PixelType>::frameToFrameNorm(int frame) const
 template<typename FrameType,typename PixelType>
 std::shared_ptr<FrameType> FrameBufferPlayer_<FrameType,PixelType>::getSharedFrame() const
 {
-    std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer = _buffer.lock();
+    std::shared_ptr<FrameBuffer_<FrameType> > buffer = _buffer.lock();
 
     if(buffer)
     {
@@ -827,7 +829,7 @@ std::shared_ptr<FrameType> FrameBufferPlayer_<FrameType,PixelType>::getSharedFra
 template<typename FrameType,typename PixelType>
 std::shared_ptr<FrameType> FrameBufferPlayer_<FrameType,PixelType>::getSharedFrame()
 {
-    std::shared_ptr<BaseFrameBuffer_<FrameType> > buffer = _buffer.lock();
+    std::shared_ptr<FrameBuffer_<FrameType> > buffer = _buffer.lock();
 
     if(buffer)
     {
@@ -835,9 +837,9 @@ std::shared_ptr<FrameType> FrameBufferPlayer_<FrameType,PixelType>::getSharedFra
     }
     else
     {
-        return FrameType::emptySharedFrame();
+        return FrameType::makeShared();
     }
 }
 
     
-} }
+} }  // namespace ofx::Video

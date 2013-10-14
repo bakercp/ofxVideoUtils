@@ -28,7 +28,7 @@
 
 #include <deque>
 #include "Frame.h"
-#include "BaseFrameBuffer.h"
+//#include "BaseFrameBuffer.h"
 
 
 namespace ofx {
@@ -36,7 +36,7 @@ namespace Video {
 
 
 template<typename FrameType>
-class FrameBuffer_: public BaseFrameBuffer_<FrameType>
+class FrameBuffer_//: public BaseFrameBuffer_<FrameType>
 {
 public:
     typedef std::shared_ptr<FrameBuffer_<FrameType> > SharedPtr;
@@ -184,7 +184,7 @@ std::shared_ptr<FrameType> FrameBuffer_<FrameType>::getFrame(int frameNumber) co
 {
     if(0 == getCount())
     {
-        return FrameType::emptySharedFrame();
+        return FrameType::makeShared();
     }
 
     // super modulo
