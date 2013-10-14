@@ -35,6 +35,7 @@
 namespace ofx {
 namespace Video {
 
+    
 template<typename FrameType, typename PixelType>
 class FrameBufferPlayer_:
     public BaseVideoDraws_<PixelType>,
@@ -185,8 +186,6 @@ private:
 
 
 typedef FrameBufferPlayer_<Frame_<unsigned char>,unsigned char > FrameBufferPlayer;
-//typedef FrameBufferPlayer_<Frame_<unsigned char>,unsigned char >::SharedPtr SharedFrameBufferPlayer;
-//typedef FrameBufferPlayer_<Frame_<unsigned char>,unsigned char >::WeakPtr   WeakFrameBufferPlayer;
 
 
 //------------------------------------------------------------------------------
