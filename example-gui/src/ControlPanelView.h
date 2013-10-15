@@ -4,21 +4,21 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 
-//class ofApp;
+class ofApp;
 class ControlPanelView
 {
 public:
     ControlPanelView();
-    void setup();
+    void setup(ofApp* app);
     void update();
     void draw();
     
     ofxPanel gui;
-   // ofApp *app;
+    ofApp *app;
     ofParameterGroup parameters;
-    ofParameter<bool> isRecording;
     void onIsRecordingChanged(bool & doRecording);
-    
-   // ofParameter<float> bufferViewPosition;
+    void onBufferPositionChanged(ofVec3f & point);
+
 };
-//#include "ofApp.h"
+
+#include "ofApp.h"

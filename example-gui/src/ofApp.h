@@ -66,6 +66,7 @@ public:
     Video::FrameBufferPlayer::SharedPtr bufferPlayer;
 
     ofParameter<bool> isRecording;
+    ofParameter<ofVec3f> bufferPosition;
     void startRecording();
     
     ControlPanelView controlPanelView;

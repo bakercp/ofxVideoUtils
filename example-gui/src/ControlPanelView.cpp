@@ -8,22 +8,30 @@
 
 #include "ControlPanelView.h"
 
-
-void ControlPanelView::setup()
+ControlPanelView::ControlPanelView()
 {
-    //this->app = app;
-    //isRecording.set("isRecording", app->isRecording);
-    
-    parameters.add(isRecording);
-    isRecording.addListener(this, &ControlPanelView::onIsRecordingChanged);
+
+}
+void ControlPanelView::setup(ofApp* app)
+{
+    this->app = app;
+    parameters.add(app->isRecording);
+    parameters.add(app->bufferPosition);
+    app->bufferPosition.addListener(this, &ControlPanelView::onBufferPositionChanged);
+    app->isRecording.addListener(this, &ControlPanelView::onIsRecordingChanged);
+    gui.setup(parameters);
 }
 
-
+void ControlPanelView::onBufferPositionChanged(ofVec3f & point)
+{
+    ofLogVerbose() << "onBufferPositionChanged";
+}
 void ControlPanelView::onIsRecordingChanged(bool & doRecording)
 {
+    ofLogVerbose() << "onIsRecordingChanged";
     if (doRecording)
     {
-        //app->startRecording();
+        app->startRecording();
     }
 }
 
@@ -34,5 +42,5 @@ void ControlPanelView::update()
 
 void ControlPanelView::draw()
 {
-
+    gui.draw();
 }

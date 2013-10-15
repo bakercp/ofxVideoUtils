@@ -29,6 +29,7 @@
 //------------------------------------------------------------------------------
 void ofApp::setup()
 {
+    ofSetLogLevel(OF_LOG_VERBOSE);
 	ofBackground(255,255,255);
     ofSetVerticalSync(true);
 	ofSetFrameRate(60);
@@ -62,8 +63,11 @@ void ofApp::setup()
     bufferPlayer = Video::FrameBufferPlayer::makeShared();
     bufferPlayer->loadBuffer(buffer);
     bufferPlayer->start();
+    isRecording.set("isRecording", false);
+    bufferPosition.set("bufferPosition",ofVec3f(320, 0, 0), ofVec3f(0, 0,0), ofVec3f(ofGetWidth(), ofGetHeight(), 0));
+    
 
-	
+	controlPanelView.setup(this);
 }
 void ofApp::startRecording()
 {
@@ -142,15 +146,20 @@ void ofApp::draw()
     ofDrawBitmapString(keys,20,400);
     
     
-    int x = 320;
-    int y = 20;
     
+    ofPushMatrix();
+    ofTranslate(bufferPosition);
 
     ofSetColor(255);
     ofNoFill();
-    ofRect(x,y,camWidth,camHeight);
+    ofRect(0,0,camWidth,camHeight);
+    
 
-    if(bufferPlayerFrame) bufferPlayerFrame->draw(x,y,camWidth,camHeight);
+    if(bufferPlayerFrame)
+    {
+      bufferPlayerFrame->draw(0,0,camWidth,camHeight);  
+    }
+        
 
     ofFill();
     ofSetColor(255,255,0,127);
@@ -160,7 +169,7 @@ void ofApp::draw()
         float ff = bufferPlayer->getFrame() / (float)bufferPlayer->getCapacity();
         ofSetRectMode(OF_RECTMODE_CENTER);
         ofSetColor(0,255,0);
-        ofRect(x + camWidth*ff,y+camHeight-2.5,3,10);
+        ofRect(camWidth*ff,camHeight-2.5,3,10);
         ofPopStyle();
     }
     
@@ -169,7 +178,7 @@ void ofApp::draw()
         float ff = bufferPlayer->getLoopPointStart() / (float)bufferPlayer->getCapacity();
         ofSetRectMode(OF_RECTMODE_CENTER);
         ofSetColor(0,0,255);
-        ofRect(x + camWidth*ff,y+camHeight-2.5,3,10);
+        ofRect(camWidth*ff,camHeight-2.5,3,10);
         ofPopStyle();
     }
     
@@ -178,7 +187,7 @@ void ofApp::draw()
         float ff = bufferPlayer->getLoopPointEnd() / (float)bufferPlayer->getCapacity();
         ofSetRectMode(OF_RECTMODE_CENTER);
         ofSetColor(0,0,255);
-        ofRect(x + camWidth*ff,y+camHeight-2.5,3,10);
+        ofRect(camWidth*ff,camHeight-2.5,3,10);
         ofPopStyle();
     }
     
@@ -188,14 +197,14 @@ void ofApp::draw()
 //    ofDrawBitmapString(stats, x + 20, y + 20);
 
     
-    x += (camWidth + 0);
+   /* x += (camWidth + 0);
     if((x + 320)> ofGetWidth()) {
         y+= camHeight + 0;
         x = 320;
-    }
-    
+    }*/
+    ofPopMatrix();
     ofDisableAlphaBlending();
-
+    controlPanelView.draw();
 }
 
 //------------------------------------------------------------------------------
